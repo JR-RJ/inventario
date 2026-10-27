@@ -2,39 +2,58 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Sistema de Ventas</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-  body { background:#f0f2f5; min-height:100vh; }
+  body { background:#f0f2f5; min-height:100vh; overflow-x:hidden; }
   
   /* LOGIN */
-  .login-wrap { display:flex; justify-content:center; align-items:center; min-height:100vh; background:linear-gradient(135deg,#667eea,#764ba2); }
-  .login-box { background:#fff; padding:40px; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.3); width:350px; }
-  .login-box h2 { text-align:center; margin-bottom:25px; color:#333; }
+  .login-wrap { display:flex; justify-content:center; align-items:center; min-height:100vh; background:linear-gradient(135deg,#667eea,#764ba2); padding:20px; }
+  .login-box { background:#fff; padding:30px 25px; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.3); width:100%; max-width:350px; }
+  .login-box h2 { text-align:center; margin-bottom:25px; color:#333; font-size:22px; }
   .login-box input { width:100%; padding:12px; margin:8px 0; border:1px solid #ddd; border-radius:6px; font-size:14px; }
   .login-box button { width:100%; padding:12px; background:#667eea; color:#fff; border:none; border-radius:6px; font-size:16px; cursor:pointer; margin-top:10px; }
   .login-box button:hover { background:#5568d3; }
   .login-error { color:#e74c3c; text-align:center; font-size:13px; margin-top:10px; }
   
-  /* APP */
-  .navbar { background:#2c3e50; padding:15px 30px; display:flex; justify-content:space-between; align-items:center; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,.1); }
-  .navbar h1 { font-size:20px; }
+  /* NAVBAR */
+  .navbar { background:#2c3e50; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,.1); position:sticky; top:0; z-index:100; }
+  .navbar h1 { font-size:18px; }
   .nav-links { display:flex; gap:5px; flex-wrap:wrap; }
-  .nav-links button { background:transparent; color:#fff; border:none; padding:10px 18px; cursor:pointer; border-radius:6px; font-size:14px; transition:.2s; }
+  .nav-links button { background:transparent; color:#fff; border:none; padding:10px 14px; cursor:pointer; border-radius:6px; font-size:14px; transition:.2s; }
   .nav-links button:hover { background:rgba(255,255,255,.1); }
   .nav-links button.active { background:#667eea; }
   .logout { background:#e74c3c !important; }
   
-  .container { padding:30px; max-width:1200px; margin:0 auto; }
+  /* Botón hamburguesa (oculto en desktop) */
+  .hamburger { display:none; background:transparent; border:none; color:#fff; font-size:26px; cursor:pointer; padding:5px 10px; }
+  
+  /* Overlay del menú móvil */
+  .nav-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:200; }
+  .nav-overlay.show { display:block; }
+  
+  /* Drawer lateral móvil */
+  .nav-drawer { position:fixed; top:0; left:-280px; width:260px; height:100%; background:#2c3e50; z-index:300; transition:left .3s ease; padding:20px 0; overflow-y:auto; box-shadow:2px 0 10px rgba(0,0,0,.2); }
+  .nav-drawer.open { left:0; }
+  .nav-drawer-header { padding:15px 20px; border-bottom:1px solid rgba(255,255,255,.1); display:flex; justify-content:space-between; align-items:center; color:#fff; }
+  .nav-drawer-header h2 { font-size:18px; }
+  .nav-drawer-close { background:transparent; border:none; color:#fff; font-size:24px; cursor:pointer; }
+  .nav-drawer button { display:block; width:100%; text-align:left; background:transparent; color:#fff; border:none; padding:14px 20px; cursor:pointer; font-size:15px; border-bottom:1px solid rgba(255,255,255,.05); }
+  .nav-drawer button:hover, .nav-drawer button.active { background:rgba(255,255,255,.1); }
+  .nav-drawer button.active { border-left:4px solid #667eea; padding-left:16px; }
+  .nav-drawer .drawer-logout { background:#e74c3c !important; margin-top:20px; text-align:center; }
+  
+  .container { padding:20px; max-width:1200px; margin:0 auto; }
   .section { display:none; }
   .section.active { display:block; }
   
-  .card { background:#fff; padding:25px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.05); margin-bottom:20px; }
-  .card h3 { margin-bottom:20px; color:#2c3e50; }
+  .card { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.05); margin-bottom:15px; }
+  .card h3 { margin-bottom:15px; color:#2c3e50; font-size:17px; }
   
-  .form-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px; }
+  .form-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
   .form-row input, .form-row select { flex:1; min-width:150px; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:14px; }
-  .btn { padding:10px 20px; background:#27ae60; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
+  .btn { padding:10px 18px; background:#27ae60; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:14px; white-space:nowrap; }
   .btn:hover { background:#219150; }
   .btn-warning { background:#f39c12; }
   .btn-warning:hover { background:#d68910; }
@@ -46,31 +65,32 @@
   .btn-danger:hover { background:#c0392b; }
   .btn-sm { padding:6px 12px; font-size:12px; }
   
-  table { width:100%; border-collapse:collapse; margin-top:10px; }
-  th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
-  th { background:#f8f9fa; color:#2c3e50; font-weight:600; }
+  /* Tablas con scroll horizontal */
+  .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:10px; }
+  table { width:100%; border-collapse:collapse; min-width:500px; }
+  th, td { padding:10px 12px; text-align:left; border-bottom:1px solid #eee; white-space:nowrap; }
+  th { background:#f8f9fa; color:#2c3e50; font-weight:600; font-size:13px; }
   tr:hover { background:#f8f9fa; }
   
-  /* Fila en modo edición */
   tr.editing { background:#fff9e6 !important; }
-  tr.editing input { padding:6px; font-size:13px; }
-  .action-buttons { display:flex; gap:5px; flex-wrap:wrap; }
+  tr.editing input { padding:6px; font-size:13px; min-width:80px; }
+  .action-buttons { display:flex; gap:5px; flex-wrap:nowrap; }
   
   /* DASHBOARD */
-  .stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:15px; margin-bottom:20px; }
-  .stat-box { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.05); border-left:4px solid #667eea; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px; margin-bottom:20px; }
+  .stat-box { background:#fff; padding:18px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.05); border-left:4px solid #667eea; }
   .stat-box.green { border-left-color:#27ae60; }
   .stat-box.red { border-left-color:#e74c3c; }
   .stat-box.orange { border-left-color:#f39c12; }
   .stat-box.purple { border-left-color:#9b59b6; }
-  .stat-box h4 { color:#7f8c8d; font-size:13px; margin-bottom:8px; text-transform:uppercase; }
-  .stat-box .value { font-size:24px; font-weight:bold; color:#2c3e50; }
+  .stat-box h4 { color:#7f8c8d; font-size:12px; margin-bottom:6px; text-transform:uppercase; }
+  .stat-box .value { font-size:22px; font-weight:bold; color:#2c3e50; word-break:break-word; }
   
-  .deuda-item { display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee; }
+  .deuda-item { display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee; gap:10px; }
   .deuda-item:last-child { border-bottom:none; }
-  .deuda-amount { color:#e74c3c; font-weight:bold; }
+  .deuda-amount { color:#e74c3c; font-weight:bold; white-space:nowrap; }
   
-  .badge { padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+  .badge { padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; white-space:nowrap; }
   .badge-paid { background:#d4edda; color:#155724; }
   .badge-pending { background:#fff3cd; color:#856404; }
   .badge-debt { background:#f8d7da; color:#721c24; }
@@ -79,13 +99,13 @@
   .costo { color:#e67e22; }
   .venta { color:#27ae60; }
   
-  /* Buscador de producto */
+  /* Buscador */
   .search-wrap { position:relative; flex:1; min-width:200px; }
   .search-input-wrap { position:relative; display:flex; align-items:center; }
   .search-input-wrap input { width:100%; padding-right:35px; }
   .search-clear { position:absolute; right:10px; background:transparent; border:none; color:#95a5a6; cursor:pointer; font-size:16px; display:none; }
   .search-clear.show { display:block; }
-  .search-results { position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #ddd; border-radius:6px; max-height:250px; overflow-y:auto; z-index:100; box-shadow:0 4px 12px rgba(0,0,0,.1); display:none; }
+  .search-results { position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #ddd; border-radius:6px; max-height:250px; overflow-y:auto; z-index:50; box-shadow:0 4px 12px rgba(0,0,0,.1); display:none; }
   .search-results.show { display:block; }
   .search-item { padding:10px 12px; cursor:pointer; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; }
   .search-item:hover { background:#f0f7ff; }
@@ -94,20 +114,55 @@
   .search-item .prod-price { color:#27ae60; font-size:13px; }
   .search-empty { padding:12px; text-align:center; color:#95a5a6; font-size:13px; }
   
-  /* Resumen de abonos por cliente */
+  /* Resumen abonos */
   .abono-cliente-row { border-bottom:1px solid #eee; padding:15px; }
   .abono-cliente-row:last-child { border-bottom:none; }
   .abono-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-  .abono-info { flex:1; min-width:200px; }
+  .abono-info { flex:1; min-width:150px; }
   .abono-info .cliente-nombre { font-weight:bold; color:#2c3e50; font-size:15px; margin-bottom:4px; }
-  .abono-info .cliente-stats { font-size:13px; color:#7f8c8d; }
-  .abono-info .cliente-stats span { margin-right:15px; }
+  .abono-info .cliente-stats { font-size:13px; color:#7f8c8d; display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
   .abono-total { font-size:20px; font-weight:bold; color:#27ae60; }
   .abono-detail { margin-top:15px; padding-top:15px; border-top:1px dashed #ddd; display:none; }
   .abono-detail.show { display:block; }
   .abono-detail table { margin-top:0; }
   .abono-detail th { background:#f0f7ff; font-size:13px; }
   .abono-detail td { font-size:13px; padding:8px 12px; }
+  
+  /* ===== RESPONSIVE MÓVIL ===== */
+  @media (max-width: 768px) {
+    .hamburger { display:block; }
+    .navbar .nav-links { display:none; }
+    .navbar h1 { font-size:16px; }
+    .container { padding:15px; }
+    .card { padding:15px; }
+    .card h3 { font-size:16px; }
+    
+    .form-row { flex-direction:column; }
+    .form-row input, .form-row select, .form-row .btn { width:100%; min-width:100%; }
+    .search-wrap { min-width:100%; }
+    
+    .stats { grid-template-columns:repeat(2, 1fr); gap:10px; }
+    .stat-box { padding:14px; }
+    .stat-box .value { font-size:18px; }
+    .stat-box h4 { font-size:11px; }
+    
+    table { min-width:600px; }
+    
+    .action-buttons { flex-direction:column; width:100%; }
+    .action-buttons .btn { width:100%; }
+    
+    .abono-header { flex-direction:column; align-items:flex-start; }
+    .abono-total { font-size:18px; }
+    
+    .deuda-item { flex-direction:column; gap:4px; }
+    .deuda-amount { font-size:16px; }
+  }
+  
+  @media (max-width: 400px) {
+    .stats { grid-template-columns:1fr; }
+    .login-box { padding:25px 20px; }
+    .login-box h2 { font-size:20px; }
+  }
 </style>
 </head>
 <body>
@@ -126,6 +181,7 @@
 <!-- APP -->
 <div id="appScreen" style="display:none;">
   <nav class="navbar">
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
     <h1>📊 Sistema de Ventas</h1>
     <div class="nav-links">
       <button onclick="showSection('dashboard', this)" class="active">📈 Resumen</button>
@@ -136,12 +192,27 @@
       <button class="logout" onclick="logout()">Salir</button>
     </div>
   </nav>
+  
+  <!-- Drawer móvil -->
+  <div class="nav-overlay" id="navOverlay" onclick="toggleMenu()"></div>
+  <div class="nav-drawer" id="navDrawer">
+    <div class="nav-drawer-header">
+      <h2>📊 Menú</h2>
+      <button class="nav-drawer-close" onclick="toggleMenu()">✕</button>
+    </div>
+    <button onclick="showSectionMobile('dashboard', this)" class="active">📈 Resumen</button>
+    <button onclick="showSectionMobile('productos', this)">📦 Productos</button>
+    <button onclick="showSectionMobile('ventas', this)">💰 Ventas</button>
+    <button onclick="showSectionMobile('clientes', this)">👥 Clientes</button>
+    <button onclick="showSectionMobile('abonos', this)">💵 Abonos</button>
+    <button class="drawer-logout" onclick="logout()">🚪 Salir</button>
+  </div>
 
   <div class="container">
     
     <!-- DASHBOARD -->
     <div id="dashboard" class="section active">
-      <h2 style="margin-bottom:20px; color:#2c3e50;">📈 Resumen General</h2>
+      <h2 style="margin-bottom:15px; color:#2c3e50; font-size:20px;">📈 Resumen General</h2>
       <div class="stats">
         <div class="stat-box green">
           <h4>Total Ventas</h4>
@@ -152,16 +223,16 @@
           <div class="value" id="statAbonos">$0</div>
         </div>
         <div class="stat-box orange">
-          <h4>Dinero por Cobrar</h4>
+          <h4>Por Cobrar</h4>
           <div class="value" id="statPorCobrar">$0</div>
         </div>
         <div class="stat-box purple">
           <h4>Ganancia Neta</h4>
           <div class="value" id="statGanancia">$0</div>
-          <div class="small">Valor venta - Costo real</div>
+          <div class="small">Venta - Costo</div>
         </div>
         <div class="stat-box red">
-          <h4>Clientes con Deuda</h4>
+          <h4>Deudores</h4>
           <div class="value" id="statDeudores">0</div>
         </div>
       </div>
@@ -173,7 +244,7 @@
       
       <div class="card">
         <h3>📋 Últimas Ventas</h3>
-        <div id="ultimasVentas"></div>
+        <div class="table-wrap" id="ultimasVentas"></div>
       </div>
     </div>
     
@@ -187,14 +258,16 @@
           <input type="number" id="prodValor" placeholder="Valor de venta" min="0" step="0.01">
           <button class="btn" onclick="guardarProducto()">Guardar</button>
         </div>
-        <p class="small">💡 <strong>Valor real:</strong> lo que te cuesta el producto. <strong>Valor de venta:</strong> a cómo lo vendes.</p>
+        <p class="small">💡 <strong>Valor real:</strong> lo que te cuesta. <strong>Valor de venta:</strong> a cómo lo vendes.</p>
       </div>
       <div class="card">
         <h3>Lista de Productos</h3>
-        <table>
-          <thead><tr><th>Nombre</th><th>Valor Real (Costo)</th><th>Valor de Venta</th><th>Ganancia</th><th>Acción</th></tr></thead>
-          <tbody id="tablaProductos"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>Costo</th><th>Venta</th><th>Ganancia</th><th>Acción</th></tr></thead>
+            <tbody id="tablaProductos"></tbody>
+          </table>
+        </div>
       </div>
     </div>
     
@@ -215,14 +288,16 @@
           <input type="number" id="ventaCantidad" placeholder="Cantidad" min="1" value="1">
           <button class="btn" onclick="guardarVenta()">Registrar Venta</button>
         </div>
-        <p class="small">💡 Escribe para buscar el producto. Selecciona uno de la lista.</p>
+        <p class="small">💡 Escribe para buscar el producto.</p>
       </div>
       <div class="card">
         <h3>Historial de Ventas</h3>
-        <table>
-          <thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Cant.</th><th>Total Venta</th><th>Abonado</th><th>Saldo</th><th>Ganancia</th><th>Estado</th></tr></thead>
-          <tbody id="tablaVentas"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Cant.</th><th>Total</th><th>Abonado</th><th>Saldo</th><th>Ganancia</th><th>Estado</th></tr></thead>
+            <tbody id="tablaVentas"></tbody>
+          </table>
+        </div>
       </div>
     </div>
     
@@ -237,10 +312,12 @@
       </div>
       <div class="card">
         <h3>Lista de Clientes</h3>
-        <table>
-          <thead><tr><th>Nombre</th><th>Ventas</th><th>Total Compras</th><th>Total Abonos</th><th>Deuda</th><th>Acción</th></tr></thead>
-          <tbody id="tablaClientes"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>Ventas</th><th>Compras</th><th>Abonos</th><th>Deuda</th><th>Acción</th></tr></thead>
+            <tbody id="tablaClientes"></tbody>
+          </table>
+        </div>
       </div>
     </div>
     
@@ -257,7 +334,7 @@
       </div>
       <div class="card">
         <h3>💼 Resumen de Abonos por Cliente</h3>
-        <p class="small" style="margin-bottom:15px;">Vista unificada: total abonado por cada cliente. Haz clic en "Ver detalle" para ver los abonos individuales.</p>
+        <p class="small" style="margin-bottom:15px;">Total abonado por cliente. Toca "Ver detalle" para ver los abonos.</p>
         <div id="resumenAbonos"></div>
       </div>
     </div>
@@ -271,14 +348,9 @@ let data = JSON.parse(localStorage.getItem('sistemaVentas')) || {
   productos: [], clientes: [], ventas: [], abonos: []
 };
 
-// Migración: productos antiguos sin valorReal
 data.productos.forEach(p => {
-  if (p.valorReal === undefined) {
-    p.valorReal = 0;
-    p.valorVenta = p.valor;
-  }
+  if (p.valorReal === undefined) { p.valorReal = 0; p.valorVenta = p.valor; }
 });
-// Migración: ventas antiguas sin costo
 data.ventas.forEach(v => {
   if (v.valorRealUnitario === undefined) {
     const p = data.productos.find(x => x.id === v.productoId);
@@ -286,21 +358,18 @@ data.ventas.forEach(v => {
   }
 });
 
-// Limpieza automática de datos huérfanos
 function limpiarDatosHuerfanos() {
-  let limpiados = { ventas: 0, abonos: 0 };
-  const ventasSinCliente = data.ventas.filter(v => !data.clientes.some(c => c.id === v.clienteId));
-  const ventasSinProducto = data.ventas.filter(v => !data.productos.some(p => p.id === v.productoId));
-  const ventasHuerfanas = [...ventasSinCliente, ...ventasSinProducto];
+  const ventasHuerfanas = data.ventas.filter(v => 
+    !data.clientes.some(c => c.id === v.clienteId) || 
+    !data.productos.some(p => p.id === v.productoId)
+  );
   const idsHuerfanos = ventasHuerfanas.map(v => v.id);
   const abonosHuerfanos = data.abonos.filter(a => idsHuerfanos.includes(a.ventaId));
-  limpiados.ventas = ventasHuerfanas.length;
-  limpiados.abonos = abonosHuerfanos.length;
-  data.abonos = data.abonos.filter(a => !idsHuerfanos.includes(a.ventaId));
-  data.ventas = data.ventas.filter(v => !idsHuerfanos.includes(v.id));
-  if (limpiados.ventas > 0 || limpiados.abonos > 0) {
+  if (ventasHuerfanas.length > 0 || abonosHuerfanos.length > 0) {
+    data.abonos = data.abonos.filter(a => !idsHuerfanos.includes(a.ventaId));
+    data.ventas = data.ventas.filter(v => !idsHuerfanos.includes(v.id));
     save();
-    alert(`🧹 Limpieza automática:\n\nSe eliminaron ${limpiados.ventas} venta(s) y ${limpiados.abonos} abono(s) huérfanos.`);
+    alert(`🧹 Limpieza automática:\n${ventasHuerfanos.length} venta(s) y ${abonosHuerfanos.length} abono(s) huérfanos eliminados.`);
   }
 }
 limpiarDatosHuerfanos();
@@ -309,6 +378,22 @@ function save() { localStorage.setItem('sistemaVentas', JSON.stringify(data)); }
 function fmt(n) { return '$' + Number(n).toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0}); }
 
 let editingProductId = null;
+
+// ===== MENÚ MÓVIL =====
+function toggleMenu() {
+  document.getElementById('navDrawer').classList.toggle('open');
+  document.getElementById('navOverlay').classList.toggle('show');
+}
+
+function showSectionMobile(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-drawer button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  editingProductId = null;
+  toggleMenu();
+  renderAll();
+}
 
 // ===== LOGIN =====
 function login() {
@@ -328,9 +413,10 @@ function logout() {
   document.getElementById('user').value = '';
   document.getElementById('pass').value = '';
   document.getElementById('loginError').textContent = '';
+  document.getElementById('navDrawer').classList.remove('open');
+  document.getElementById('navOverlay').classList.remove('show');
 }
 
-// ===== NAVEGACIÓN =====
 function showSection(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -347,7 +433,7 @@ function guardarProducto() {
   const valorVenta = parseFloat(document.getElementById('prodValor').value);
   if (!nombre || !valorVenta || valorVenta <= 0) { alert('Completa todos los campos correctamente'); return; }
   if (valorVenta < valorReal) {
-    if (!confirm('⚠️ El valor de venta es menor al costo. ¿Deseas continuar?')) return;
+    if (!confirm('⚠️ El valor de venta es menor al costo. ¿Continuar?')) return;
   }
   data.productos.push({ id: Date.now(), nombre, valorReal, valorVenta, valor: valorVenta });
   save();
@@ -364,9 +450,9 @@ function guardarEdicion(id) {
   const nombre = document.getElementById('edit-nombre-' + id).value.trim();
   const valorReal = parseFloat(document.getElementById('edit-costo-' + id).value) || 0;
   const valorVenta = parseFloat(document.getElementById('edit-venta-' + id).value);
-  if (!nombre || !valorVenta || valorVenta <= 0) { alert('Completa todos los campos correctamente'); return; }
+  if (!nombre || !valorVenta || valorVenta <= 0) { alert('Completa todos los campos'); return; }
   if (valorVenta < valorReal) {
-    if (!confirm('⚠️ El valor de venta es menor al costo. ¿Deseas continuar?')) return;
+    if (!confirm('⚠️ El valor de venta es menor al costo. ¿Continuar?')) return;
   }
   const producto = data.productos.find(p => p.id === id);
   if (producto) {
@@ -402,34 +488,29 @@ function eliminarCliente(id) {
   const ventasCliente = data.ventas.filter(v => v.clienteId === id);
   const ventasIds = ventasCliente.map(v => v.id);
   const abonosCliente = data.abonos.filter(a => ventasIds.includes(a.ventaId));
-  let mensaje = `⚠️ ¿Eliminar al cliente "${cliente.nombre}"?\n\n`;
-  mensaje += `Se eliminarán también:\n• ${ventasCliente.length} venta(s)\n• ${abonosCliente.length} abono(s)\n\nEsta acción no se puede deshacer.`;
+  let mensaje = `⚠️ ¿Eliminar a "${cliente.nombre}"?\n\n• ${ventasCliente.length} venta(s)\n• ${abonosCliente.length} abono(s)\n\nEsta acción no se puede deshacer.`;
   if (!confirm(mensaje)) return;
   data.abonos = data.abonos.filter(a => !ventasIds.includes(a.ventaId));
   data.ventas = data.ventas.filter(v => v.clienteId !== id);
   data.clientes = data.clientes.filter(c => c.id !== id);
   save();
   renderAll();
-  alert('✅ Cliente y todos sus datos relacionados han sido eliminados.');
+  alert('✅ Cliente y datos relacionados eliminados.');
 }
 
-// ===== BUSCADOR DE PRODUCTOS EN VENTAS =====
+// ===== BUSCADOR =====
 function filtrarProductos() {
   const input = document.getElementById('ventaProductoSearch');
   const results = document.getElementById('ventaProductoResults');
   const clearBtn = document.getElementById('ventaProductoClear');
   const query = input.value.trim().toLowerCase();
-  
   if (query.length === 0) {
     results.classList.remove('show');
     clearBtn.classList.remove('show');
     return;
   }
-  
   clearBtn.classList.add('show');
-  
   const filtrados = data.productos.filter(p => p.nombre.toLowerCase().includes(query));
-  
   if (filtrados.length === 0) {
     results.innerHTML = '<div class="search-empty">No se encontraron productos</div>';
   } else {
@@ -460,7 +541,6 @@ function limpiarBusquedaProducto() {
   document.getElementById('ventaProductoSearch').focus();
 }
 
-// Cerrar resultados al hacer clic fuera
 document.addEventListener('click', (e) => {
   const wrap = document.querySelector('.search-wrap');
   if (wrap && !wrap.contains(e.target)) {
@@ -474,8 +554,7 @@ function guardarVenta() {
   const productoId = parseInt(document.getElementById('ventaProductoId').value);
   const cantidad = parseInt(document.getElementById('ventaCantidad').value);
   if (!clienteId || !productoId || !cantidad || cantidad <= 0) { 
-    alert('Completa todos los campos (selecciona cliente y producto)'); 
-    return; 
+    alert('Completa todos los campos'); return; 
   }
   const producto = data.productos.find(p => p.id === productoId);
   const total = producto.valorVenta * cantidad;
@@ -498,10 +577,10 @@ function cargarVentasCliente() {
   if (!clienteId) { cont.innerHTML = ''; return; }
   const ventas = data.ventas.filter(v => v.clienteId === clienteId);
   if (ventas.length === 0) {
-    cont.innerHTML = '<p style="color:#7f8c8d; padding:10px;">Este cliente no tiene ventas registradas.</p>';
+    cont.innerHTML = '<p style="color:#7f8c8d; padding:10px;">Este cliente no tiene ventas.</p>';
     return;
   }
-  let html = '<table><thead><tr><th>Fecha</th><th>Producto</th><th>Total</th><th>Abonado</th><th>Saldo</th><th>Abonar</th></tr></thead><tbody>';
+  let html = '<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Producto</th><th>Total</th><th>Abonado</th><th>Saldo</th><th>Abonar</th></tr></thead><tbody>';
   ventas.forEach(v => {
     const prod = data.productos.find(p => p.id === v.productoId);
     const abonado = data.abonos.filter(a => a.ventaId === v.id).reduce((s,a) => s + a.monto, 0);
@@ -516,7 +595,7 @@ function cargarVentasCliente() {
       <td>${saldo > 0 ? `<button class="btn btn-sm" onclick="registrarAbono(${v.id})">Abonar</button>` : '<span class="badge badge-paid">Pagado</span>'}</td>
     </tr>`;
   });
-  html += '</tbody></table>';
+  html += '</tbody></table></div>';
   cont.innerHTML = html;
 }
 
@@ -536,7 +615,6 @@ function registrarAbono(ventaId) {
   renderAll();
 }
 
-// Toggle detalle de abonos por cliente
 function toggleDetalleAbono(clienteId) {
   const detail = document.getElementById('abono-detail-' + clienteId);
   if (detail) detail.classList.toggle('show');
@@ -554,8 +632,8 @@ function renderAll() {
         <td><input type="number" id="edit-venta-${p.id}" value="${p.valorVenta}" min="0" step="0.01"></td>
         <td>${fmt(ganancia)}</td>
         <td class="action-buttons">
-          <button class="btn btn-sm" onclick="guardarEdicion(${p.id})">💾 Guardar</button>
-          <button class="btn btn-secondary btn-sm" onclick="cancelarEdicion()">✖ Cancelar</button>
+          <button class="btn btn-sm" onclick="guardarEdicion(${p.id})">💾</button>
+          <button class="btn btn-secondary btn-sm" onclick="cancelarEdicion()">✖</button>
         </td>
       </tr>`;
     }
@@ -565,13 +643,13 @@ function renderAll() {
       <td class="venta">${fmt(p.valorVenta)}</td>
       <td style="color:${ganancia>=0?'#27ae60':'#e74c3c'}; font-weight:bold;">${fmt(ganancia)}</td>
       <td class="action-buttons">
-        <button class="btn btn-warning btn-sm" onclick="editarProducto(${p.id})">✏️ Editar</button>
-        <button class="btn btn-danger btn-sm" onclick="eliminarProducto(${p.id})">🗑️ Eliminar</button>
+        <button class="btn btn-warning btn-sm" onclick="editarProducto(${p.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarProducto(${p.id})">🗑️</button>
       </td>
     </tr>`;
   }).join('') || '<tr><td colspan="5" style="text-align:center; color:#7f8c8d;">Sin productos</td></tr>';
   
-  // ✅ CLIENTES: ahora con Total Compras y Total Abonos
+  // Clientes
   document.getElementById('tablaClientes').innerHTML = data.clientes.map(c => {
     const ventas = data.ventas.filter(v => v.clienteId === c.id);
     const totalCompras = ventas.reduce((s,v) => s + v.total, 0);
@@ -582,10 +660,10 @@ function renderAll() {
     return `<tr>
       <td>${c.nombre}</td>
       <td>${ventas.length}</td>
-      <td style="color:#2c3e50; font-weight:bold;">${fmt(totalCompras)}</td>
+      <td style="font-weight:bold;">${fmt(totalCompras)}</td>
       <td style="color:#27ae60; font-weight:bold;">${fmt(totalAbonos)}</td>
       <td style="color:${deuda>0?'#e74c3c':'#27ae60'}; font-weight:bold;">${fmt(deuda)}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="eliminarCliente(${c.id})">Eliminar</button></td>
+      <td><button class="btn btn-danger btn-sm" onclick="eliminarCliente(${c.id})">🗑️</button></td>
     </tr>`;
   }).join('') || '<tr><td colspan="6" style="text-align:center; color:#7f8c8d;">Sin clientes</td></tr>';
   
@@ -619,53 +697,49 @@ function renderAll() {
     </tr>`;
   }).join('') || '<tr><td colspan="9" style="text-align:center; color:#7f8c8d;">Sin ventas</td></tr>';
   
-  // ✅ ABONOS UNIFICADOS POR CLIENTE
+  // Resumen abonos
   const resumenPorCliente = {};
   data.abonos.forEach(a => {
-    if (!resumenPorCliente[a.clienteId]) {
-      resumenPorCliente[a.clienteId] = { abonos: [], total: 0 };
-    }
+    if (!resumenPorCliente[a.clienteId]) resumenPorCliente[a.clienteId] = { abonos: [], total: 0 };
     resumenPorCliente[a.clienteId].abonos.push(a);
     resumenPorCliente[a.clienteId].total += a.monto;
   });
-  
   const resumenArr = Object.entries(resumenPorCliente);
   if (resumenArr.length === 0) {
-    document.getElementById('resumenAbonos').innerHTML = '<p style="color:#7f8c8d; padding:10px; text-align:center;">No hay abonos registrados aún.</p>';
+    document.getElementById('resumenAbonos').innerHTML = '<p style="color:#7f8c8d; padding:10px; text-align:center;">No hay abonos aún.</p>';
   } else {
     document.getElementById('resumenAbonos').innerHTML = resumenArr.map(([cid, info]) => {
       const c = data.clientes.find(x => x.id === parseInt(cid));
       const nombre = c ? c.nombre : 'Cliente eliminado';
-      const cantidad = info.abonos.length;
-      // Ordenar abonos por fecha descendente
       const abonosOrdenados = info.abonos.slice().sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
       const detalleRows = abonosOrdenados.map(a => {
         const v = data.ventas.find(x => x.id === a.ventaId);
         const p = v ? data.productos.find(x => x.id === v.productoId) : null;
         return `<tr>
           <td>${new Date(a.fecha).toLocaleDateString('es-CO')}</td>
-          <td>${p ? p.nombre : 'Producto eliminado'}</td>
+          <td>${p ? p.nombre : 'Eliminado'}</td>
           <td>${v ? fmt(v.total) : '-'}</td>
           <td style="color:#27ae60; font-weight:bold;">${fmt(a.monto)}</td>
         </tr>`;
       }).join('');
-      
       return `<div class="abono-cliente-row">
         <div class="abono-header">
           <div class="abono-info">
             <div class="cliente-nombre">👤 ${nombre}</div>
             <div class="cliente-stats">
-              <span>📝 ${cantidad} abono(s)</span>
-              <button class="btn btn-info btn-sm" onclick="toggleDetalleAbono(${cid})" style="margin-left:10px;">Ver detalle</button>
+              <span>📝 ${info.abonos.length} abono(s)</span>
+              <button class="btn btn-info btn-sm" onclick="toggleDetalleAbono(${cid})">Ver detalle</button>
             </div>
           </div>
           <div class="abono-total">${fmt(info.total)}</div>
         </div>
         <div class="abono-detail" id="abono-detail-${cid}">
-          <table>
-            <thead><tr><th>Fecha</th><th>Producto</th><th>Venta</th><th>Monto</th></tr></thead>
-            <tbody>${detalleRows}</tbody>
-          </table>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Fecha</th><th>Producto</th><th>Venta</th><th>Monto</th></tr></thead>
+              <tbody>${detalleRows}</tbody>
+            </table>
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -685,7 +759,6 @@ function renderAll() {
   document.getElementById('statPorCobrar').textContent = fmt(porCobrar);
   document.getElementById('statGanancia').textContent = fmt(gananciaNeta);
   
-  // Deudores
   const deudores = {};
   data.ventas.forEach(v => {
     const ab = data.abonos.filter(a => a.ventaId === v.id).reduce((s,a) => s + a.monto, 0);
@@ -704,7 +777,6 @@ function renderAll() {
         return `<div class="deuda-item"><span>👤 ${c?c.nombre:'Desconocido'}</span><span class="deuda-amount">${fmt(monto)}</span></div>`;
       }).join('');
   
-  // Últimas ventas
   const ult = data.ventas.slice().reverse().slice(0,5);
   document.getElementById('ultimasVentas').innerHTML = ult.length === 0 
     ? '<p style="color:#7f8c8d; padding:10px;">Sin ventas aún</p>'
